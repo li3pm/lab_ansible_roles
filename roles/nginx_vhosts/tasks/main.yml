@@ -1,0 +1,38 @@
+---
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  become: yes
+- name: Create directories for virtual hosts
+  file:
+    path: /var/www/{{ item }}
+    state: directory
+    mode: '0755'
+  loop: "{{ sites }}"
+  become: yes
+
+- name: Copy vhost configuration files
+  template:
+    src: vhost.conf.j2
+    dest: /etc/nginx/sites-available/{{ item }}
+    mode: '0644'
+  loop: "{{ sites }}"
+  become: yes
+  notify: Restart nginx
+- name: Enable virtual hosts
+  file:
+    src: /etc/nginx/sites-available/{{ item }}
+    dest: /etc/nginx/sites-enabled/{{ item }}
+    state: link
+  loop: "{{ sites }}"
+  become: yes
+  notify: Restart nginx
+- name: Copy index.html for virtual hosts
+  template:
+    src: index.html.j2
+    dest: /var/www/{{ item }}/index.html
+    mode: '0644'
+  loop: "{{ sites }}"
+  become: yes

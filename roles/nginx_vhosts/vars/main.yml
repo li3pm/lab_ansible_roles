@@ -1,0 +1,6 @@
+---
+sites:
+  - mehmat.ru
+  - fizfak.ru
+  - etis.com
+# vars file for roles/nginx_vhosts
